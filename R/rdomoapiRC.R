@@ -2,22 +2,29 @@
 Domo <- setRefClass("Domo",
 	fields=list(client_id='ANY',secret='ANY',domain='ANY',scope='ANY',access_time='POSIXct',api_env='ANY'),
 	methods=list(
-		initialize=function(client_id=NA,secret=NA,domain='api.domo.com',scope=c('data'),access_time=as.POSIXct(NA)){
+		initialize=function(client_id=NA,secret=NA,domain=NA,scope=c('data'),access_time=as.POSIXct(NA)){
 			if( is.na(client_id) & Sys.getenv("RDOMOAPI_CLIENTID") != '' ){
 				client_id <<- Sys.getenv("RDOMOAPI_CLIENTID")
+			}else if( !is.na(client_id) ) {
+				client_id <<- client_id
 			}else{
 				stop('No Client ID Provided')
 			}
 
 			if( is.na(secret) & Sys.getenv("RDOMOAPI_SECRET") != '' ){
 				secret <<- Sys.getenv("RDOMOAPI_SECRET")
+			}else if( !is.na(secret) ){
+				secret <<- secret
 			}else{
 				stop('No Secret Provided')
 			}
-			if( Sys.getenv('RDOMOAPI_DOMAIN') != '' ){
+
+			if( is.na(domain) & Sys.getenv('RDOMOAPI_DOMAIN') != '' ){
 				domain <<- Sys.getenv('RDOMOAPI_DOMAIN')
-			}else{
+			}else if( !is.na(domain) ){
 				domain <<- domain
+			}else{
+				domain <<- 'api.domo.com'
 			}
 			scope <<- scope
 			access_time <<- access_time
@@ -27,7 +34,6 @@ Domo <- setRefClass("Domo",
 )
 
 Domo$methods(set_access=function(){
-
 	auth64 <- RCurl::base64(paste(.self$client_id,.self$secret,sep=':'))[[1]]
 	my_headers <- httr::add_headers(c(Authorization=paste('Basic',auth64,sep=' ')))
 
@@ -45,49 +51,7 @@ Domo$methods(set_access=function(){
 
 })
 
-Domo$methods(access_init=function(){
-
-	return_value <- 0
-
-	data_access <- set_access(client_id,secret,type='data')
-	user_access <- set_access(client_id,secret,type='user')
-	dashboard_access <- set_access(client_id,secret,type='dashboard')
-	audit_access <- set_access(client_id,secret,type='audit')
-
-	if( data_access == 1 ){
-		assign("client_id",client_id,.rdomoapi_env)
-		assign("secret",secret,.rdomoapi_env)
-		cat('Data access success!',fill=TRUE)
-		return_value <- 1
-	}
-	if( user_access == 1 ){
-		assign("client_id",client_id,.rdomoapi_env)
-		assign("secret",secret,.rdomoapi_env)
-		cat('User access success!',fill=TRUE)
-		return_value <- 1
-	}
-	if( dashboard_access == 1 ){
-		assign("client_id",client_id,.rdomoapi_env)
-		assign("secret",secret,.rdomoapi_env)
-		cat('Dashboard access success!',fill=TRUE)
-		return_value <- 1
-	}
-	if( audit_access == 1 ){
-		assign("client_id",client_id,.rdomoapi_env)
-		assign("secret",secret,.rdomoapi_env)
-		cat('Audit access success!',fill=TRUE)
-		return_value <- 1
-	}
-	if( max(data_access,user_access) == 0 ){
-		cat('Invalid credentials. Please try again.',fill=TRUE)
-	}
-
-
-	return(return_value)
-})
-
-
-Domo$methods(get_access=function(type='data'){
+Domo$methods(get_access=function(){
 
 	out <- 0
 
@@ -108,7 +72,7 @@ Domo$methods(get_access=function(type='data'){
 })
 
 Domo$methods(ds_get=function(ds,r_friendly_names=TRUE,...){
-	my_headers <- httr::add_headers(c(Authorization=paste('bearer',get_access(type='data'),sep=' ')))
+	my_headers <- httr::add_headers(c(Authorization=paste('bearer',get_access(),sep=' ')))
 	my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/data',sep='')
 	out <- httr::content((httr::GET(my_url,my_headers,query=list(includeHeader='true',fileName='bogus.csv'))),na=c('\\N'),...)
 
@@ -123,6 +87,10 @@ Domo$methods(ds_get=function(ds,r_friendly_names=TRUE,...){
 		}
 
 		names(out) <- new_name$new_name
+	}
+
+	if( sum(class(out) == 'list') > 0 ){
+		stop('Error: ',out$error,' -- ',out$error_description)
 	}
 
 	return(out)
