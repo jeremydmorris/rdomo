@@ -6,7 +6,7 @@ library(tidyverse)
 
 devtools::load_all()
 
-modocorp <- Domo$new(client_id='96dc3209-89b0-41d5-8944-1f4ebb56e434',secret='fa6592829c048230c5fffd5ce0d1e25950e7bf3b1ebdf09fbaf2f329080f2e55',scope='data',domain='api.domo.com')
+modocorp <- Domo$new(client_id='aaa',secret='aaa',scope='data',domain='api.domo.com')
 domodomo <- Domo$new()
 
 modo_download <- modocorp$ds_get('45511431-9da5-4cd5-9795-378fb77cc847')
