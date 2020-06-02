@@ -259,9 +259,15 @@ DomoUtilities <- setRefClass("DomoUtilities",
 	)
 )
 
+#' Reference class containing functionality to interact with Domo.
+#' 
+#' Inherits fields from DomoUtilities
+#' 
+#' All methods documented separately via standard documentation methods.
 Domo <- setRefClass("Domo",contains='DomoUtilities',
 	methods=list(
 		ds_get=function(ds,r_friendly_names=TRUE,...){
+			"Download data from Domo into a dataframe (tibble)."
 			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/data',sep='')
 			out <- httr::content((httr::GET(my_url,my_headers,query=list(includeHeader='true',fileName='bogus.csv'))),na=c('\\N'),...)
@@ -286,6 +292,7 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			return(out)
 		},
 		ds_create=function(df_up,name,description='',update_method='REPLACE',other_props=-1){
+			"Create a new data set."
 			#creates a stream
 			ds <- .self$stream_create(df_up, name, description, update_method)
 
@@ -294,12 +301,15 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			return(ds)
 		},
 		ds_update=function(ds_id, df_up){
+			"Update an existing data set."
 			.self$stream_upload(ds_id, df_up)
 		},
 		ds_meta=function(...){
+			"Get all meta data related to a data set."
 			.self$util_ds_meta(...)
 		},
 		ds_list=function(limit=0,offset=0,df_output=TRUE){
+			"List all data sets"
 			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
 
 			out <- -1
@@ -327,6 +337,7 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 
 		},
 		ds_delete=function(ds,prompt_before_delete=TRUE){
+			"Delete a data set."
 			if( prompt_before_delete ){
 				invisible(readline(prompt="Permanently deletes a DataSet from your Domo instance. This is destructive and cannot be reversed. Press enter to continue."))
 			}
@@ -336,9 +347,5 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			out_status <- ifelse(out$status_code == 204,'Successfully deleted a dataset','Some Failure')
 			return(out_status)
 		}
-		
-
-
-
 	)
 )
