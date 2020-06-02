@@ -325,7 +325,18 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 
 			return(out)
 
+		},
+		ds_delete=function(ds,prompt_before_delete=TRUE){
+			if( prompt_before_delete ){
+				invisible(readline(prompt="Permanently deletes a DataSet from your Domo instance. This is destructive and cannot be reversed. Press enter to continue."))
+			}
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,sep='')
+			out <- (httr::DELETE(my_url,my_headers))
+			out_status <- ifelse(out$status_code == 204,'Successfully deleted a dataset','Some Failure')
+			return(out_status)
 		}
+		
 
 
 

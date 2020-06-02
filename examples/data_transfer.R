@@ -36,3 +36,7 @@ domo_sc <- domodomo$ds_meta(domo_create)
 
 # All ds in modocorp
 mc_ds <- modocorp$ds_list()
+
+# Clean up
+domodomo$ds_delete(domo_create)
+modocorp$ds_delete(modo_create)
