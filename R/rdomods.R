@@ -291,7 +291,7 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 
 			return(out)
 		},
-		ds_create=function(df_up,name,description='',update_method='REPLACE',other_props=-1){
+		ds_create=function(df_up,name,description='',update_method='REPLACE'){
 			"Create a new data set."
 			#creates a stream
 			ds <- .self$stream_create(df_up, name, description, update_method)
@@ -346,6 +346,27 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			out <- (httr::DELETE(my_url,my_headers))
 			out_status <- ifelse(out$status_code == 204,'Successfully deleted a dataset','Some Failure')
 			return(out_status)
+		},
+		ds_query=function(ds,query,return_data=TRUE){
+			"Evaluate a query against a data set."
+			interpret_query <- function(x,col_names){
+				out <- x
+				names(out) <- col_names
+				return(tibble::as_tibble(out))
+			}
+			my_headers <- httr::add_headers(c('Content-Type'='application/json','Accept'='application/json',Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/query/execute/',ds,sep='')
+			query_body <- list(
+				sql=query
+			)
+			out <- httr::content((httr::POST(my_url,my_headers,body=rjson::toJSON(query_body))))
+			out_out <- out
+			if( return_data ){
+				out_out <- dplyr::bind_rows(lapply(out$rows,interpret_query,col_names=out$columns))
+			}
+			return(out_out)
 		}
+		
+		
 	)
 )
