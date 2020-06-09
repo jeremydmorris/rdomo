@@ -25,10 +25,10 @@ ds_get(x)
 \details{
 This function provides an easy way to get a data set from Domo into your local R environment. Data set column names in Domo can have spaces and special characters, the r_friendly_names parameter is set to modify column names by default and can be turned off by sending in FALSE. 
 
-The user can pass parameters to the httr::GET call that retrieves the data from Domo. The most frequent reason this is necessary is to modify column types as the data is being read. Examples will be shown later.
+The user can pass parameters to the \code{httr::GET} call that retrieves the data from Domo. The most frequent reason this is necessary is to modify column types as the data is being read. Examples will be shown later.
 }
 \value{
-Returns a tibble representation of the data as it exists in Domo. If r_friendly_names is FALSE, the tibble will have the column names as seen in Domo. If it is TRUE, the names will be modified to follow standard R naming conventions.
+Returns a tibble representation of the data as it exists in Domo. If \code{r_friendly_names} is \code{FALSE}, the tibble will have the column names as seen in Domo. If it is \code{TRUE}, the names will be modified to follow standard R naming conventions.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}
