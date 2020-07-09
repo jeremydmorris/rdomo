@@ -452,9 +452,47 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			remove_uu <- function(uu,grp_id){ httr::content(httr::DELETE(paste('https://',.self$domain,'/v1/groups/',grp_id,'/users/',uu,sep=''),my_headers)) }
 			out <- sapply(users,remove_uu,grp_id=group_id)
 			return(out)
+		},
+		page_create=function(page_def){
+			my_headers <- httr::add_headers(c('Content-Type'='application/json',Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/pages/')
+			out <- httr::content(httr::POST(my_url,my_headers,body=rjson::toJSON(page_def)))
+			return(out)
+		},
+		page_get=function(page_id){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/pages/',page_id)
+			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
+		},
+		page_get_collections=function(page_id){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/pages/',page_id,'/collections')
+			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
+		},
+		page_list=function(limit=-1,offset=0){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/pages/')
+			if( limit > 0 ){
+				out <- httr::content(httr::GET(my_url,my_headers,query=list(limit=limit,offset=offset)))
+			}else{
+				tt <- httr::content(httr::GET(my_url,my_headers,query=list(limit=50,offset=0)))
+				out <- tt
+				off <- 50
+				while( length(tt) > 0 ){
+					tt <- httr::content(httr::GET(my_url,my_headers,query=list(limit=50,offset=off)))
+					out <- c(out,tt)
+					off <- off + 50
+				}
+			}
+			return(out)
+		},
+		page_update=function(page_id,page_def){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/pages/',page_id)
+			out <- httr::content(httr::PUT(my_url,my_headers,body=rjson::toJSON(page_def)))
+			return(out)
 		}
-		
-		
-		
 	)
 )
