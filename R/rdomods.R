@@ -365,8 +365,19 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 				out_out <- dplyr::bind_rows(lapply(out$rows,interpret_query,col_names=out$columns))
 			}
 			return(out_out)
+		},
+		streams_search=function(ds){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/streams/search')
+			out <- unlist(httr::content((httr::GET(my_url,my_headers,query=list(q=paste0('dataSource.id:',ds),fields='all')))),recursive=FALSE)
+			return(out)
+		},
+		streams_get=function(stream_id){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/streams/',stream_id)
+			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
 		}
-		
 		
 	)
 )
