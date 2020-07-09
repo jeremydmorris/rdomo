@@ -366,6 +366,16 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			}
 			return(out_out)
 		},
+		ds_rename=function(ds,new_name,new_description=''){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,sep='')
+			update <- list(name=new_name)
+			if( new_description != '' ){
+				update$description <- new_description
+			}
+			out <- (httr::PUT(my_url,my_headers,body=rjson::toJSON(update)))
+			return(out)
+		},
 		streams_search=function(ds){
 			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste0('https://',.self$domain,'/v1/streams/search')
@@ -377,7 +387,74 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			my_url <- paste0('https://',.self$domain,'/v1/streams/',stream_id)
 			out <- httr::content(httr::GET(my_url,my_headers))
 			return(out)
+		},
+		groups_add_users=function(group_id,users){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			local_user_list <- unlist(users)
+			add_uu <- function(uu,grp_id){ httr::content(httr::PUT(paste('https://',.self$domain,'/v1/groups/',grp_id,'/users/',uu,sep=''),my_headers)) }
+			out <- sapply(users,add_uu,grp_id=group_id)
+			return(out)
+		},
+		groups_create=function(group_name,users=-1,active='true'){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			local_user_list <- unlist(users)
+			my_body <- list(name=group_name,active=active)
+			out <- httr::content(httr::POST(paste('https://',.self$domain,'/v1/groups/',sep=''),body=rjson::toJSON(my_body),my_headers))
+			if( min(local_user_list) > 0 ){
+				tmp <- .self$groups_add_users(out$id,local_user_list)
+			}
+			return(out)
+		},
+		groups_delete=function(group_id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			out <- (httr::DELETE(paste('https://',.self$domain,'/v1/groups/',group_id,sep=''),my_headers))
+			return(out)
+		},
+		groups_get=function(group_id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			out <- httr::content(httr::GET(paste('https://',.self$domain,'/v1/groups/',group_id,sep=''),my_headers))
+			return(out)
+		},
+		groups_list=function(df_output=TRUE){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			n_ret <- 1
+			my_batches <- list()
+			i <- 1
+			batch <- 500
+			while( n_ret > 0 ){
+				my_batches[[i]] <- httr::content(httr::GET(paste('https://',.self$domain,'/v1/groups',sep=''),my_headers,query=list(limit=batch,offset=((i-1)*batch))))
+				n_ret <- ifelse(length(my_batches[[i]]) < batch,0,1)
+				i <- i + 1
+			}
+			out <- unlist(my_batches,recursive=FALSE)
+			if( df_output ){
+				out <- dplyr::bind_rows(lapply(out,as.data.frame))
+			}
+			return(out)
+		},
+		groups_list_users=function(group_id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			n_ret <- 1
+			my_batches <- list()
+			i <- 1
+			batch <- 500
+			while( n_ret > 0 ){
+				my_batches[[i]] <- httr::content(httr::GET(paste0('https://',.self$domain,'/v1/groups/',group_id,'/users'),my_headers,query=list(limit=batch,offset=((i-1)*batch))))
+				n_ret <- ifelse(length(my_batches[[i]]) < batch,0,1)
+				i <- i + 1
+			}
+			out <- unlist(my_batches,recursive=TRUE)
+			return(out)
+		},
+		groups_remove_users=function(group_id,users){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			local_user_list <- unlist(users)
+			remove_uu <- function(uu,grp_id){ httr::content(httr::DELETE(paste('https://',.self$domain,'/v1/groups/',grp_id,'/users/',uu,sep=''),my_headers)) }
+			out <- sapply(users,remove_uu,grp_id=group_id)
+			return(out)
 		}
+		
+		
 		
 	)
 )
