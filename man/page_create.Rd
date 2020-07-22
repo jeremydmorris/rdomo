@@ -7,14 +7,14 @@
 page_create(page_def)
 }
 \arguments{
-\item{page_def}{List object with page definition}
+\item{page_def}{List object with page definition. Link in references below for list specification.}
 }
 \value{
 List of pages
 }
 \description{
-Download list of pages
+This function will create a page in Domo. See references for more information.
 }
-\examples{
-page_create()
+\references{
+API Documentation: \url{https://developer.domo.com/docs/page-api-reference/page#Create\%20a\%20page}
 }

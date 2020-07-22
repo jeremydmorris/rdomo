@@ -17,6 +17,6 @@ Some output from Domo
 \description{
 Update a page spec
 }
-\examples{
-page_update()
+\references{
+API Documentation: \url{https://developer.domo.com/docs/page-api-reference/page#Update\%20a\%20page}
 }

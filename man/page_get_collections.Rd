@@ -15,6 +15,6 @@ List of raw output from Domo API
 \description{
 Download information regarding a specific Domo page.
 }
-\examples{
-page_get()
+\references{
+API Documentation: \url{https://developer.domo.com/docs/page-api-reference/page#Retrieve\%20a\%20page\%20collection}
 }

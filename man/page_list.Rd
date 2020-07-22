@@ -15,6 +15,6 @@ List of pages.
 \description{
 Download list of pages. Note that subpages will be returned along with their parent, meaning more pages will be returned than might be expected.
 }
-\examples{
-page_list()
+\references{
+API Documentation: \url{https://developer.domo.com/docs/page-api-reference/page#List\%20pages}
 }
