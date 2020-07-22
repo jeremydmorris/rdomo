@@ -15,6 +15,6 @@ List with all policies defined on a data set.
 \description{
 List all PDP policies on a given dataset.
 }
-\examples{
-pdp_list('32e44f16-c76b-4de3-ac0e-1b7d2ad2f15d')
+\references{
+API Documentation: \url{https://developer.domo.com/docs/dataset-api-reference/dataset#List\%20Personalized\%20Data\%20Permission\%20(PDP)\%20policies}
 }

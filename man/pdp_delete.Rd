@@ -16,7 +16,9 @@ Success message (maybe??)
 }
 \description{
 Delete a specific policy from the given dataset.
+
+NOTE: This is destructive. Once the PDP policy is deleted, it can't be restored w/o creating a new policy from scratch. It is recommended to backup policies before deleting.
 }
-\examples{
-pdp_delete('32e44f16-c76b-4de3-ac0e-1b7d2ad2f15d',7)
+\references{
+API Documentation: \url{https://developer.domo.com/docs/dataset-api-reference/dataset#Delete\%20a\%20Personalized\%20Data\%20Permission\%20(PDP)\%20policy}
 }

@@ -493,6 +493,39 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			my_url <- paste0('https://',.self$domain,'/v1/pages/',page_id)
 			out <- httr::content(httr::PUT(my_url,my_headers,body=rjson::toJSON(page_def)))
 			return(out)
+		},
+		#### PDP Related Functions ####
+		pdp_create=function(ds,policy_def){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/policies',sep='')
+			out <- httr::content(httr::POST(my_url,my_headers,body=rjson::toJSON(policy_def)))
+			return(out)
+		},
+		pdp_delete=function(ds,policy){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/policies/',policy,sep='')
+			out <- httr::content(httr::DELETE(my_url,my_headers))
+			return(out)
+		},
+		pdp_enable=function(ds,new_state){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,sep='')
+			my_meta <- .self$util_ds_meta(ds)
+			my_body <- list(name=my_meta$name,pdpEnabled=new_state)
+			out <- httr::content(httr::PUT(my_url,my_headers,body=rjson::toJSON(my_body)))
+			return(out)
+		},
+		pdp_list=function(ds){
+			my_headers <- httr::add_headers(c(Accept="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/policies',sep='')
+			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
+		},
+		pdp_update=function(ds,policy,policy_def){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/policies/',policy,sep='')
+			out <- httr::content(httr::PUT(my_url,my_headers,body=rjson::toJSON(policy_def)))
+			return(out)
 		}
 	)
 )

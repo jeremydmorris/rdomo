@@ -2,7 +2,7 @@
 % Please edit documentation in R/pdp_enable.R
 \name{pdp_enable}
 \alias{pdp_enable}
-\title{List all PDP policies defined on a given dataset.}
+\title{Enable PDP on a data set}
 \usage{
 pdp_enable(ds, new_state)
 }
@@ -12,11 +12,11 @@ pdp_enable(ds, new_state)
 \item{new_state}{Either TRUE or FALSE depending on what you want done.}
 }
 \value{
-List with all data set properties (I think).
+List with all data set properties (including whether or not PDP is enabled).
 }
 \description{
-List all PDP policies on a given dataset.
+This is a special case of the ds_update function just to toggle PDP on and off. The ds_update function could also be used for this purpose.
 }
-\examples{
-pdp_enable('32e44f16-c76b-4de3-ac0e-1b7d2ad2f15d','TRUE')
+\references{
+API Documentation: \url{https://developer.domo.com/docs/dataset-api-reference/dataset#Update\%20a\%20DataSet}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/pdp_update.R
 \name{pdp_update}
 \alias{pdp_update}
-\title{List all PDP policies defined on a given dataset.}
+\title{Update a single PDP policy}
 \usage{
 pdp_update(ds, policy, policy_def)
 }
@@ -17,8 +17,8 @@ pdp_update(ds, policy, policy_def)
 List of new policy definition.
 }
 \description{
-List all PDP policies on a given dataset.
+To update an individual PDP policy, you'll need to specify all required fields for a PDP policy. Do this via a list object, the function will convert to JSON automatically.
 }
-\examples{
-pdp_update('32e44f16-c76b-4de3-ac0e-1b7d2ad2f15d',some,stuff)
+\references{
+API Documentation: \url{https://developer.domo.com/docs/dataset-api-reference/dataset#Update\%20a\%20Personalized\%20Data\%20Permission\%20(PDP)\%20policy}
 }
