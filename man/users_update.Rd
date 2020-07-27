@@ -7,16 +7,16 @@
 users_update(user_id, user_def)
 }
 \arguments{
-\item{user_id}{Page id from Domo}
+\item{user_id}{User id from Domo}
 
-\item{user_def}{Updated page definition}
+\item{user_def}{Updated user definition}
 }
 \value{
-Some output from Domo
+Updated user object from Domo.
 }
 \description{
-Update a user
+Update a user object. Tip: get the existing user object first, then modify elements of that object for the update.
 }
-\examples{
-user_update()
+\references{
+API Documentation: \url{https://developer.domo.com/docs/users-api-reference/users-2#List\%20users}
 }

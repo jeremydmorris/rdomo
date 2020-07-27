@@ -66,6 +66,13 @@ DomoUtilities <- setRefClass("DomoUtilities",
 
 			return(out)
 		},
+		domo_content=function(response_object,success_code=200){
+			out <- httr::content(response_object)
+			if( response_object$status != success_code ){
+				warning('\nAPI returned status: ',response_object$status,'. \nWith message: ',httr::content(response_object)$message)
+			}
+			return(out)
+		},
 		stream_create=function(df_up, name, description, updateMethod){
 
 			dataframe_schema <- schema_definition(df_up)
@@ -525,6 +532,73 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/policies/',policy,sep='')
 			out <- httr::content(httr::PUT(my_url,my_headers,body=rjson::toJSON(policy_def)))
+			return(out)
+		},
+		#### User Functions ####
+		users_add=function(x_name,x_email,x_role,x_sendInvite=FALSE){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			url <- paste0('https://',.self$domain,'/v1/users')
+			my_body <- list(
+				email=x_email,
+				name=x_name,
+				role=x_role
+			)
+			invite_send <- 'false'
+			if( x_sendInvite ){
+				invite_send <- 'true'
+			}
+			rr <- httr::POST(url,my_headers,body=rjson::toJSON(my_body),query=list('sendInvite'=invite_send))
+			out <- .self$domo_content(rr,success_code=201)
+			return(out)
+		},
+		users_get=function(user_id){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/users/',user_id)
+			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
+		},
+		users_list=function(df_output=TRUE,batch_size=500){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			n_ret <- 1
+			my_batches <- list()
+			i <- 1
+			batch <- batch_size
+			while( n_ret > 0 ){
+				my_batches[[i]] <- tryCatch({
+					httr::content(httr::GET(paste('https://',.self$domain,'/v1/users',sep=''),my_headers,query=list(limit=batch,offset=((i-1)*batch))))
+				},error=function(e){
+					message(e)
+					return(NA)
+				})
+				n_ret <- ifelse(length(my_batches[[i]]) < batch,0,1)
+				i <- i + 1
+			}
+			pre_out <- unlist(my_batches,recursive=FALSE)
+
+			out <- lapply(pre_out,function(x){
+				x$createdAt <- as.POSIXct(x$createdAt,'UTC','%Y-%m-%dT%H:%M:%SZ')
+				x$updatedAt <- as.POSIXct(x$updatedAt,'UTC','%Y-%m-%dT%H:%M:%OSZ')
+				return(x)
+			})
+			
+			if( df_output ){
+				out <- dplyr::bind_rows(lapply(out,as_tibble))
+			}
+			
+			return(out)
+		},
+		users_update=function(user_id,user_def){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/users/',user_id)
+			response <- httr::PUT(my_url,my_headers,body=rjson::toJSON(user_def))
+			out <- .self$domo_content(response)
+			return(out)
+		},
+		users_delete=function(user_id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/users/',user_id)
+			rr <- httr::DELETE(my_url,my_headers)
+			out <- .self$domo_content(rr,success_code=204)
 			return(out)
 		}
 	)
