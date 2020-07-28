@@ -40,3 +40,18 @@ mc_ds <- modocorp$ds_list()
 # Clean up
 domodomo$ds_delete(domo_create)
 modocorp$ds_delete(modo_create)
+
+
+
+# Test upload
+ti <- Domo$new(client_id=Sys.getenv('RDOMO_TEST_CLIENT_ID'),secret=Sys.getenv('RDOMO_TEST_SECRET'),domain='api.domo.com',scope=c('user','data'))
+rd <- data.frame(matrix(rnorm(100),ncol=2))
+new_df <- ti$ds_create(rd,'TEST TEST')
+
+dd <- data.frame(aa=c('Вот эбаут санрайз','Из зере тайм','Вот эбаут килин филдс'),bb=c(1,2,3))
+uu_df <- ti$ds_update(new_df,as.data.frame(dd))
+
+ee <- data.frame(aa=rnorm(100))
+uu_df <- ti$ds_update(new_df,as.data.frame(ee))
+
+one_col <- ti$ds_create(as.data.frame(ee),'TEST ONE COLUMN')
