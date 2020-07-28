@@ -75,7 +75,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 		},
 		stream_create=function(df_up, name, description, updateMethod){
 
-			dataframe_schema <- schema_definition(df_up)
+			dataframe_schema <- .self$schema_definition(df_up)
 			json <- list(dataSet=list(name=name, description=description, schema=list(columns=dataframe_schema$columns)), updateMethod=updateMethod)
 			body <- rjson::toJSON(json)
 
@@ -178,13 +178,13 @@ DomoUtilities <- setRefClass("DomoUtilities",
 		},
 		stream_upload=function(ds_id, df_up){
 
-			domoSchema <- rjson::toJSON(list(columns=schema_domo(ds_id)))
-			dataSchema <- rjson::toJSON(list(columns=schema_data(df_up)))
-
+			domoSchema <- rjson::toJSON(list(columns=.self$schema_domo(ds_id)))
+			dataSchema <- rjson::toJSON(list(columns=.self$schema_data(df_up)))
+			
 			stream_id <- get_stream_id(ds_id)
 
 			if(!(identical(domoSchema,dataSchema))){
-				dataframe_schema <- schema_definition(df_up)
+				dataframe_schema <- .self$schema_definition(df_up)
 				json <- list(schema=list(columns=dataframe_schema$columns))
 				body <- rjson::toJSON(json)
 				update_dataset(ds_id, body)
@@ -207,7 +207,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 					end <- total_rows
 				}
 				data_frag <- df_up[start:end,]
-				uploadPartStr (stream_id, exec_id, part, data_frag)
+				uploadPartStr(stream_id, exec_id, part, data_frag)
 				part <- part + 1
 				start <- end + 1
 				if (start >= total_rows){
@@ -225,7 +225,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 
 			z <- gzfile(FNAME, "wb")
 
-			write.table(data, file=z, col.names=FALSE, row.names=FALSE, sep=',', na='\\N', qmethod="double")
+			readr::write_csv(as.data.frame(data),path=z,col_names=FALSE,na='\\N')
 			close(z)
 
 			size <- file.info(FNAME)$size
