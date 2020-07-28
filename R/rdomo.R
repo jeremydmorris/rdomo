@@ -79,7 +79,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			json <- list(dataSet=list(name=name, description=description, schema=list(columns=dataframe_schema$columns)), updateMethod=updateMethod)
 			body <- rjson::toJSON(json)
 
-			headers <- httr::add_headers(c("Content-Type"='application/json', Accept='application/json', Authorization=paste('bearer',get_access(), sep=' ')))
+			headers <- httr::add_headers(c("Content-Type"='application/json', Accept='application/json', Authorization=paste('bearer',.self$get_access(), sep=' ')))
 			url <- paste('https://',.self$domain,'/v1/streams', sep='')
 
 			response <- httr::POST(url, headers, body=body)
@@ -91,7 +91,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			return (ds)
 		},
 		schema_definition=function (data) {
-			schema <- schema_data(data)
+			schema <- .self$schema_data(data)
 			schema_def <- NULL
 			schema_def$columns <- list()
 			for (i in 1:length(schema$name)) {
@@ -106,7 +106,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			if(!is.null(data)) {
 				for (i in 1:ncol(data)) {
 					t.name <- names(data)[i]
-					t.type <- typeConversionText(data,i)
+					t.type <- .self$typeConversionText(data,i)
 					schema$name[length(schema$name)+1] <- t.name
 					schema$type[length(schema$type)+1] <- t.type
 				}
@@ -133,7 +133,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 		},
 		typeConversionText=function(data, colindex) {
 			result <- 'STRING' #default column type
-			date_time <- convertDomoDateTime(data[,colindex])
+			date_time <- .self$convertDomoDateTime(data[,colindex])
 			if(!is.na(date_time[1])){
 				type <- class(date_time)[1]
 				if(type == 'Date') result <- 'DATE'
@@ -181,21 +181,21 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			domoSchema <- rjson::toJSON(list(columns=.self$schema_domo(ds_id)))
 			dataSchema <- rjson::toJSON(list(columns=.self$schema_data(df_up)))
 			
-			stream_id <- get_stream_id(ds_id)
+			stream_id <- .self$get_stream_id(ds_id)
 
 			if(!(identical(domoSchema,dataSchema))){
 				dataframe_schema <- .self$schema_definition(df_up)
 				json <- list(schema=list(columns=dataframe_schema$columns))
 				body <- rjson::toJSON(json)
-				update_dataset(ds_id, body)
+				.self$update_dataset(ds_id, body)
 				warning('Schema changed')
 			}
 
-			exec_id <- start_execution(stream_id)
+			exec_id <- .self$start_execution(stream_id)
 
 			total_rows <- nrow(df_up)
 
-			CHUNKSZ <- estimate_rows(df_up)
+			CHUNKSZ <- .self$estimate_rows(df_up)
 			# cat(CHUNKSZ,fill=TRUE)
 			start <- 1
 			end <- total_rows
@@ -207,7 +207,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 					end <- total_rows
 				}
 				data_frag <- df_up[start:end,]
-				uploadPartStr(stream_id, exec_id, part, data_frag)
+				.self$uploadPartStr(stream_id, exec_id, part, data_frag)
 				part <- part + 1
 				start <- end + 1
 				if (start >= total_rows){
@@ -215,7 +215,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 				}
 			}
 
-			result <- commitStream(stream_id, exec_id)
+			result <- .self$commitStream(stream_id, exec_id)
 		},
 		uploadPartStr=function (stream_id, exec_id, part, data) {
 			FNAME <- tempfile(pattern="domo", fileext=".gz")
