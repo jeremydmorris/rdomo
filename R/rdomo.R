@@ -225,7 +225,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 
 			z <- gzfile(FNAME, "wb")
 
-			readr::write_csv(as.data.frame(data),path=z,col_names=FALSE,na='\\N')
+			readr::write_csv(as.data.frame(data),file=z,col_names=FALSE,na='\\N')
 			close(z)
 
 			size <- file.info(FNAME)$size
@@ -251,7 +251,7 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			return(x$id)
 		},
 		estimate_rows=function (data, kbytes = 10000) {
-			sz <- pryr::object_size(data)
+			sz <- as.numeric(pryr::object_size(data))
 			targetSize <- kbytes * 3 # compression factor
 			if (sz / 1000 > targetSize)
 				return(floor(nrow(data)*(targetSize) / (sz/1000)))
@@ -599,6 +599,49 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			my_url <- paste0('https://',.self$domain,'/v1/users/',user_id)
 			rr <- httr::DELETE(my_url,my_headers)
 			out <- .self$domo_content(rr,success_code=204)
+			return(out)
+		},
+		
+		#### Accounts API ####
+		account_list=function(){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/accounts')
+			
+			n_ret <- 1
+			my_accounts <- list()
+			i <- 0
+			batch <- 50
+			while( n_ret > 0 ){
+				rr <- httr::GET(my_url,my_headers,query=list(limit=batch,offset=i*batch))
+				tt_out <- .self$domo_content(rr)
+				my_accounts <- c(my_accounts,tt_out)
+				i <- i + 1
+				n_ret <- ifelse(length(tt_out) < batch,0,1)
+			}
+			
+			out <- my_accounts
+			
+			return(out)
+		},
+		account_get=function(id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/accounts/',id)
+			rr <- httr::GET(my_url,my_headers)
+			out <- .self$domo_content(rr)
+			return(out)
+		},
+		account_types=function(){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/account-types/')
+			rr <- httr::GET(my_url,my_headers)
+			out <- .self$domo_content(rr)
+			return(out)
+		},
+		account_get_type=function(account_type_id){
+			my_headers <- httr::add_headers(c(Accept="application/json","Content-Type"="application/json",Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/account-types/',account_type_id)
+			rr <- httr::GET(my_url,my_headers)
+			out <- .self$domo_content(rr)
 			return(out)
 		}
 	)
