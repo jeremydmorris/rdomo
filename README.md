@@ -48,14 +48,14 @@ domo <- rdomo::Domo(scope=c('data','user'))
 
 ## How to use this package
 The functions in this package match most parts of the API documented at developer.domo.com and follow a specific convention. Each set of functions is preceeded by the portion of the API it operates on. The following lists all the sets of functions available in this package. For further help, refer to help available in R by typing "?" and the name of the function you're interested in.
-* Data sets (preceeded by "ds_") -- This set of functions is designed to transfer data in and out of Domo.
-	* ds_get -- downloads data from Domo
-	* ds_create -- creates a new data set
-	* ds_update -- updates an existing data set, only data sets created by the API can be updated
-	* ds_meta -- downloads meta data regarding a single data set
-	* ds_list -- downloads a list of data sets in your Domo instance
-	* ds_delete -- deletes a data set (be careful)
-	* ds_query -- allows you to send a query to a data set, Domo will evaluate that query and sends the results back as a list or a tibble
-	* ds_rename -- renames an existing data set
-* Groups (preceeded by "groups_") -- This set of functions modifies and creates groups.
-	* groups_add_users -- adds users to an existing group
+* **Data sets** - This set of functions is designed to transfer data in and out of Domo.
+	* **ds_get** - downloads data from Domo
+	* **ds_create** - creates a new data set
+	* **ds_update** - updates an existing data set, only data sets created by the API can be updated
+	* **ds_meta** - downloads meta data regarding a single data set
+	* **ds_list** - downloads a list of data sets in your Domo instance
+	* **ds_delete** - deletes a data set (be careful)
+	* **ds_query** - allows you to send a query to a data set, Domo will evaluate that query and sends the results back as a list or a tibble
+	* **ds_rename** - renames an existing data set
+* **Groups** - This set of functions modifies and creates groups.
+	* **groups_add_users** - adds users to an existing group
