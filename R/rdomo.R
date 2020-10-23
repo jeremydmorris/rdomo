@@ -3,24 +3,24 @@ DomoUtilities <- setRefClass("DomoUtilities",
 	fields=list(client_id='ANY',secret='ANY',domain='ANY',scope='ANY',access_time='POSIXct',api_env='ANY'),
 	methods=list(
 		initialize=function(client_id=NA,secret=NA,domain=NA,scope=c('data'),access_time=as.POSIXct(NA)){
-			if( is.na(client_id) & Sys.getenv("RDOMOAPI_CLIENTID") != '' ){
-				client_id <<- Sys.getenv("RDOMOAPI_CLIENTID")
+			if( is.na(client_id) & Sys.getenv("RDOMO_CLIENTID") != '' ){
+				client_id <<- Sys.getenv("RDOMO_CLIENTID")
 			}else if( !is.na(client_id) ) {
 				client_id <<- client_id
 			}else{
 				stop('No Client ID Provided')
 			}
 
-			if( is.na(secret) & Sys.getenv("RDOMOAPI_SECRET") != '' ){
-				secret <<- Sys.getenv("RDOMOAPI_SECRET")
+			if( is.na(secret) & Sys.getenv("RDOMO_SECRET") != '' ){
+				secret <<- Sys.getenv("RDOMO_SECRET")
 			}else if( !is.na(secret) ){
 				secret <<- secret
 			}else{
 				stop('No Secret Provided')
 			}
 
-			if( is.na(domain) & Sys.getenv('RDOMOAPI_DOMAIN') != '' ){
-				domain <<- Sys.getenv('RDOMOAPI_DOMAIN')
+			if( is.na(domain) & Sys.getenv('RDOMO_DOMAIN') != '' ){
+				domain <<- Sys.getenv('RDOMO_DOMAIN')
 			}else if( !is.na(domain) ){
 				domain <<- domain
 			}else{
