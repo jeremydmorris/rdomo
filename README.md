@@ -76,7 +76,7 @@ added_policies <- lapply(pdp_policies,function(x){
 ```
 
 ## How to use this package
-The functions in this package match most parts of the API documented at developer.domo.com and follow a specific convention. Each set of functions is preceeded by the portion of the API it operates on. The following lists all the sets of functions available in this package. For further help, refer to help available in R by typing "?" and the name of the function you're interested in.
+The functions in this package match most parts of the API documented at [developer.domo.com](https://developer.domo.com/) and follow a specific convention. Each set of functions is preceeded by the portion of the API it operates on. The following lists all the sets of functions available in this package. For further help, refer to help available in R by typing "?" and the name of the function you're interested in.
 * **Data sets** - This set of functions is designed to transfer data in and out of Domo.
 	* **ds_get** - downloads data from Domo
 	* **ds_create** - creates a new data set
