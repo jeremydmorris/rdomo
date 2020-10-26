@@ -46,6 +46,35 @@ When this is done, you can now connect without needing to specify those values. 
 domo <- rdomo::Domo(scope=c('data','user'))
 ```
 
+## Reference classes
+
+This package uses a reference class as the primary way of interacting with the Domo API. Reference classes allow us to mimic objects found in other programming languages like Python. More information can be found [here](http://adv-r.had.co.nz/R5.html).
+
+The primary benefit of using refernce classes in this package is the ability to authenticate easily against multiple Domo instances. When this is done, you can transfer data or make other modifications to multiple instances. For example, the following code authenticates against two different Domo instances, downloads data from one instance and pushes that same data to the seccond instance.
+
+```r
+domo1 <- rdomo::Domo(client_id="client id 1",secret="secret 1",scope='data')
+domo2 <- rdomo::Domo(client_id="client id 2",secret="secret 2",scope='data')
+
+data_set_to_copy <- 'data set id'
+
+data1 <- domo1$ds_get(data_set_to_copy)
+data1_info <- domo1$ds_meta(data_set_to_copy)
+
+uploaded_data <- domo2$ds_create(as.data.frame(data1),data1_info$name,data1_info$description)
+```
+
+To continue the example, if there were PDP policies on the data set copied, you might also want to copy all of the PDP policies. That can be done as follows.
+
+```r
+pdp_policies <- domo1$pdp_list(data_set_to_copy)
+added_policies <- lapply(pdp_policies,function(x){
+	policy_spec <- x
+	policy_spec$id <- NULL #doing this to make sure Domo assigns its own PDP policy id
+	pdp_create(data_set_to_copy,policy_spec)
+})
+```
+
 ## How to use this package
 The functions in this package match most parts of the API documented at developer.domo.com and follow a specific convention. Each set of functions is preceeded by the portion of the API it operates on. The following lists all the sets of functions available in this package. For further help, refer to help available in R by typing "?" and the name of the function you're interested in.
 * **Data sets** - This set of functions is designed to transfer data in and out of Domo.
