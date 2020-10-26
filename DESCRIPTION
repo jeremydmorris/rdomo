@@ -10,5 +10,5 @@ License: NA
 Encoding: UTF-8
 LazyData: true
 Imports:
-	httr,dplyr,pryr,tibble
+	httr,dplyr,pryr,tibble,tidyr
 RoxygenNote: 7.1.0

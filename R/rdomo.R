@@ -337,7 +337,8 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			}
 
 			if( df_output ){
-				out <- dplyr::bind_rows(lapply(out,tibble::as_tibble))
+				to_convert <- tibble::tibble(info=out)
+				out <- tidyr::unnest_wider(to_convert,info)
 			}
 
 			return(out)
