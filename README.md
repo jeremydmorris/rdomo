@@ -59,3 +59,26 @@ The functions in this package match most parts of the API documented at develope
 	* **ds_rename** - renames an existing data set
 * **Groups** - This set of functions modifies and creates groups.
 	* **groups_add_users** - adds users to an existing group
+	* **groups_create** - create a group
+	* **groups_delete** - delete an existing group
+	* **groups_list** - list all groups
+	* **groups_remove_users** - remove users from a group
+	* **groups_list_users** - list users in a group
+* **Pages** - functions related to managing Domo pages
+	* **page_update** - update a page
+	* **page_list** - list all pages
+	* **page_get_collections** - list all collections on a page
+	* **page_get** - get information regarding a page
+	* **page_create** - create a page
+* **PDP** - functions to manage PDP
+	* **pdp_update** - update an existing PDP policy
+	* **pdp_list** - list all PDP policies
+	* **pdp_enable** - toggle PDP on and off
+	* **pdp_delete** - delete a PDP policy
+	* **pdp_create** - create a PDP policy
+* **Users** - functions to manage users
+	* **users_delete** - delete a user
+	* **users_update** - update a user
+	* **users_list** - list all users
+	* **users_get** - get a single user record
+	* **users_add** - create a user (or users)
