@@ -73,7 +73,8 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			}
 			return(out)
 		},
-		stream_create=function(df_up, name, description, updateMethod){
+		stream_create=function(up_ds, name, description, updateMethod){
+			df_up <- as.data.frame(up_ds)
 
 			dataframe_schema <- .self$schema_definition(df_up)
 			json <- list(dataSet=list(name=name, description=description, schema=list(columns=dataframe_schema$columns)), updateMethod=updateMethod)
@@ -176,7 +177,8 @@ DomoUtilities <- setRefClass("DomoUtilities",
 			}
 			return (json[[1]]$id)
 		},
-		stream_upload=function(ds_id, df_up){
+		stream_upload=function(ds_id, up_ds){
+			df_up <- as.data.frame(up_ds)
 
 			domoSchema <- rjson::toJSON(list(columns=.self$schema_domo(ds_id)))
 			dataSchema <- rjson::toJSON(list(columns=.self$schema_data(df_up)))
