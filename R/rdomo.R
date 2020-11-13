@@ -275,13 +275,19 @@ DomoUtilities <- setRefClass("DomoUtilities",
 #' All methods documented separately via standard documentation methods.
 Domo <- setRefClass("Domo",contains='DomoUtilities',
 	methods=list(
-		ds_get=function(ds,r_friendly_names=TRUE,...){
+		ds_get=function(ds,r_friendly_names=FALSE,...){
 			"Download data from Domo into a dataframe (tibble)."
 			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste('https://',.self$domain,'/v1/datasets/',ds,'/data',sep='')
 			out <- httr::content((httr::GET(my_url,my_headers,query=list(includeHeader='true',fileName='bogus.csv'))),na=c('\\N'),...)
+			
+			# This allows the user to set r_friendly_names = TRUE by default
+			rfn <- r_friendly_names
+			if( Sys.getenv('RDOMO_RFN') != '' ){
+				rfn <- Sys.getenv('RDOMO_RFN')
+			}
 
-			if( r_friendly_names ){
+			if( rfn ){
 				#need to check for duplicate names
 				name_check <- data.frame(original=names(out),new=tolower(make.names(names(out))),stringsAsFactors=FALSE)
 				dup_check <- dplyr::mutate(dplyr::group_by(name_check,new),rn=dplyr::row_number(),n=dplyr::n())
@@ -386,16 +392,22 @@ Domo <- setRefClass("Domo",contains='DomoUtilities',
 			out <- (httr::PUT(my_url,my_headers,body=rjson::toJSON(update)))
 			return(out)
 		},
-		streams_search=function(ds){
+		stream_search=function(ds){
 			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste0('https://',.self$domain,'/v1/streams/search')
 			out <- unlist(httr::content((httr::GET(my_url,my_headers,query=list(q=paste0('dataSource.id:',ds),fields='all')))),recursive=FALSE)
 			return(out)
 		},
-		streams_get=function(stream_id){
+		stream_get=function(stream_id){
 			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
 			my_url <- paste0('https://',.self$domain,'/v1/streams/',stream_id)
 			out <- httr::content(httr::GET(my_url,my_headers))
+			return(out)
+		},
+		stream_abort=function(stream_id,execution_id){
+			my_headers <- httr::add_headers(c(Authorization=paste('bearer',.self$get_access(),sep=' ')))
+			my_url <- paste0('https://',.self$domain,'/v1/streams/',stream_id,'/executions/',execution_id,'/abort')
+			out <- httr::content(httr::PUT(my_url,my_headers))
 			return(out)
 		},
 		groups_add_users=function(group_id,users){
